@@ -1,0 +1,17 @@
+<%- include("partials/header") %> 
+
+<h3>Complete Seller Registration</h3>
+<p>Please fill in the following form to complete your seller registration.</p>
+<form method="post" action="/complete-seller-registration">
+    <div class="form-group">
+        <label for="organisationName">Organisation Name</label>
+        <input type="text" class="form-control" id="organisationName" name="organisationName" placeholder="Organisation Name">
+    </div>
+    <div class="form-group">
+        <label for="website">Website</label>    
+        <input type="text" class="form-control" id="website" name="website" placeholder="Website">
+    </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+
+<%- include("partials/footer") %> 

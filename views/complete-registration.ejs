@@ -1,0 +1,59 @@
+<%- include('partials/header') -%>
+
+<div>
+  <h1>Complete Registration</h1>
+  <form method="POST" action="/complete-registration">
+    <div class="form-group">
+      <label for="firstName">Firstname</label>
+      <input
+        type="text"
+        class="form-control"
+        id="firstName"
+        name="firstName"
+        placeholder="Firstname"
+      />
+      <label for="lastName">Lastname</label>
+      <input
+        type="text"
+        class="form-control"
+        id="lastName"
+        name="lastName"
+        placeholder="Firstname"
+      />
+      <label for="email">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        placeholder="Email"
+      />
+      <label for="address">Address</label>
+      <textarea id="address" name="address" placeholder="Address"></textarea>
+      <label for="zipcode">Zipcode</label>
+      <input
+        type="text"
+        class="form-control"
+        id="zipcode"
+        name="zipcode"
+        placeholder="Zipcode"
+      />
+      <label for="organisationName">Organisation Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="organisationName"
+        name="organisationName"
+        placeholder="Organisation Name"
+      />
+      <input type="radio" name="isSeller" value="true" checked />
+      <label for="true">I am a seller</label>
+      <br />
+      <input type="radio" name="isSeller" value="false" />
+      <label for="false">I am not a seller</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+<%- include('partials/footer') -%>
