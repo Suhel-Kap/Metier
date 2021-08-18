@@ -4,52 +4,75 @@
   <h1>Complete Registration</h1>
   <form method="POST" action="/complete-registration">
     <div class="form-group">
-      <label for="firstName">Firstname</label>
+      <label for="firstName">Firstname <span style="color: red">*</span></label>
       <input
         type="text"
         class="form-control"
         id="firstName"
         name="firstName"
         placeholder="Firstname"
+        required
       />
-      <label for="lastName">Lastname</label>
+      <label for="lastName">Lastname <span style="color: red">*</span></label>
       <input
         type="text"
         class="form-control"
         id="lastName"
         name="lastName"
-        placeholder="Firstname"
+        placeholder="Lastname"
+        required
       />
-      <label for="email">Email</label>
+      <label for="DOB">Date of Birth <span style="color: red">*</span></label>
+      <input
+        type="date"
+        class="form-control"
+        id="DOB"
+        name="DOB"
+        placeholder="Date of Birth"
+        required
+      />
+      <label for="email">Email <span style="color: red">*</span></label>
       <input
         type="email"
         class="form-control"
         id="email"
         name="email"
         placeholder="Email"
+        required
       />
-      <label for="address">Address</label>
-      <textarea id="address" name="address" placeholder="Address"></textarea>
-      <label for="zipcode">Zipcode</label>
+      <label for="address">Address <span style="color: red">*</span></label>
+      <textarea
+        id="address"
+        name="address"
+        placeholder="Address"
+        required
+      ></textarea>
+      <label for="zipcode">Zipcode<span style="color: red">*</span></label>
       <input
         type="text"
         class="form-control"
         id="zipcode"
         name="zipcode"
         placeholder="Zipcode"
+        required
       />
-      <label for="organisationName">Organisation Name</label>
+      <label for="phoneNumber"
+        >Phone Number <span style="color: red">*</span></label
+      >
       <input
-        type="text"
+        type="number"
+        min="1000000000"
+        max="9999999999"
         class="form-control"
-        id="organisationName"
-        name="organisationName"
-        placeholder="Organisation Name"
+        id="phoneNumber"
+        name="phoneNumber"
+        placeholder="Phone Number"
+        required
       />
-      <input type="radio" name="isSeller" value="true" checked />
+      <input type="radio" name="isSeller" value="true" />
       <label for="true">I am a seller</label>
       <br />
-      <input type="radio" name="isSeller" value="false" />
+      <input type="radio" name="isSeller" value="false" checked />
       <label for="false">I am not a seller</label>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>

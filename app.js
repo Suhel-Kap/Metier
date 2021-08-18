@@ -8,6 +8,9 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 
 const app = express();
 
@@ -27,6 +30,21 @@ app.use(passport.session());
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "demo",
+        allowedFormats: ["jpg", "png"],
+        transformation: [{ width: 500, height: 500, crop: "limit" }]
+    }
+});
+const parser = multer({ storage: storage });
+
 // Schemas
 
 const userSchema = new mongoose.Schema({
@@ -37,30 +55,36 @@ const userSchema = new mongoose.Schema({
         sparse: true
     },
     name: {
-        firstName: { type: String, unique: true, sparse: true },
-        lastName: { type: String, unique: true, sparse: true }
+        firstName: { type: String },
+        lastName: { type: String }
     },
-    googleId: String,
+    googleId: { type: String, unique: true, sparse: true, required: true },
+    username: { type: String, unique: true, sparse: true, required: true },
     contactInfo: {
-        userName: { type: String, unique: true, sparse: true },
         phoneNumber: { type: Number, unique: true, sparse: true },
-        addres: { type: String },
+        address: { type: String },
         zipcode: { type: String },
         DOB: { type: Date }
     },
+    registrationComplete: Boolean,
     isSeller: Boolean,
     userAdded: { type: Date, default: Date.now },
     sellerInfo: {
-        organisationName: { type: String, unique: true, sparse: true },
+        organisationName: { type: String },
+        address: { type: String },
+        zipcode: { type: String },
+        email: { type: String },
+        phoneNumber: { type: Number },
+        website: { type: String },
         socialMediaHandle: {
-            facebook: { type: String, unique: true, sparse: true },
-            twitter: { type: String, unique: true, sparse: true },
-            instagram: { type: String, unique: true, sparse: true },
-            linkedIn: { type: String, unique: true, sparse: true }
+            facebook: { type: String },
+            twitter: { type: String },
+            instagram: { type: String },
+            linkedIn: { type: String }
         },
-        employmentHistory: [{
-            companyName: { type: String, unique: true, sparse: true }
-        }],
+        employmentHistory: {
+            type: String
+        },
         typeOfBusiness: {
             type: String
         }
@@ -73,6 +97,8 @@ const productSchema = new mongoose.Schema({
     stock: Number,
     price: Number,
     description: String,
+    seller: String,
+    image: String,
     review: [String]
 });
 
@@ -106,7 +132,9 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
     function (accessToken, refreshToken, profile, cb) {
-        User.findOrCreate({ email: profile.emails[0].value, googleId: profile.id }, function (err, user) {
+        User.findOrCreate({
+            email: profile.emails[0].value, googleId: profile.id, username: profile.emails[0].value
+        }, function (err, user) {
             return cb(err, user);
         });
     }
@@ -131,13 +159,16 @@ app.get("/auth/google/complete-registration",
 app
     .route('/complete-registration')
     .get((req, res) => {
+
         if (req.isAuthenticated()) {
-            const name = req.user.name.firstName;
-            const nameLen = name.length;
-            if (nameLen === 0) { // is user has not completed registration, send him to complete registration
+            // console.log(req.user);
+            // console.log("Complete Registration");
+            if (req.user.registrationComplete === false || req.user.registrationComplete === undefined) { 
+                // is user has not completed registration, send him to complete registration
+                // console.log("User has not completed registration");
                 res.render("complete-registration");
-            } else {
-                res.render('shop');
+            } else { // if user has completed registration, send him to shop page
+                res.redirect('/shop');
             }
         } else {
             res.redirect("/login");
@@ -150,6 +181,7 @@ app
         const address = req.body.address;
         const zipcode = req.body.zipcode;
         const phoneNumber = req.body.phoneNumber;
+        const DOB = req.body.DOB;
         const isSeller = req.body.isSeller;
         User.findById(req.user.id, (err, foundUser) => {
             if (err) {
@@ -163,7 +195,10 @@ app
                     foundUser.contactInfo.phoneNumber = phoneNumber;
                     foundUser.contactInfo.address = address;
                     foundUser.contactInfo.zipcode = zipcode;
+                    foundUser.contactInfo.DOB = DOB;
                     foundUser.isSeller = isSeller;
+                    foundUser.registrationComplete = true;
+                    foundUser.markModified('name');
                     foundUser.save(() => {
                         if (isSeller === "true") {
                             // if user is a seller then complete seller information
@@ -171,9 +206,11 @@ app
                             // res.send(foundUser);
                         } else {
                             // user is not a seller then redirect to shop page
+
                             res.redirect("/shop");
                         }
                     })
+                    // console.log(foundUser);
                 }
             }
         })
@@ -185,6 +222,7 @@ app
     .route('/complete-seller-registration')
     .get((req, res) => {
         if (req.isAuthenticated()) {
+            console.log("Complete Seller Registration");
             res.render("complete-seller-registration");
         } else {
             res.redirect("/login");
@@ -198,11 +236,17 @@ app
         const linkedIn = req.body.linkedIn;
         const typeOfBusiness = req.body.typeOfBusiness;
         const employmentHistory = req.body.employmentHistory;
+        const address = req.body.address;
+        const zipcode = req.body.zipcode;
+        const phoneNumber = req.body.phoneNumber;
+        const website = req.body.website;
+        const email = req.body.email;
         User.findById(req.user.id, (err, foundUser) => {
             if (err) {
                 console.log(err);
                 res.send("Error");
             } else {
+                console.log(foundUser);
                 if (foundUser) {
                     foundUser.sellerInfo.organisationName = organisationName;
                     foundUser.sellerInfo.socialMediaHandle.facebook = facebook;
@@ -211,14 +255,55 @@ app
                     foundUser.sellerInfo.socialMediaHandle.linkedIn = linkedIn;
                     foundUser.sellerInfo.typeOfBusiness = typeOfBusiness;
                     foundUser.sellerInfo.employmentHistory = employmentHistory;
+                    foundUser.sellerInfo.address = address;
+                    foundUser.sellerInfo.zipcode = zipcode;
+                    foundUser.sellerInfo.phoneNumber = phoneNumber;
+                    foundUser.sellerInfo.website = website;
+                    foundUser.sellerInfo.email = email;
+                    foundUser.markModified('sellerInfo');
                     foundUser.save(() => {
-                        res.redirect("/shop");
+                        // redirect to payment page but leave it for now
+                        res.send("Complete Seller Registration");
                     })
                 }
+                console.log(foundUser);
             }
         })
     });
 
+app
+    .route("/upload-product")
+    .get((req, res) => {
+        if (req.isAuthenticated()) {
+            console.log(req.user.isSeller);
+            if (req.user.isSeller === true) {
+                res.render("upload-product");
+            }
+        } else {
+            res.redirect("/login");
+        }
+    })
+    .post(parser.single('image'), (req, res) => {
+        // const image = req.file.path;
+        // console.log(req.file.path);        
+        // res.json(req.file); // to see what is returned to you
+
+        Product.create({
+            image: req.file.path,
+            productName: req.body.productName,
+            stock: req.body.stock,
+            price: req.body.price,
+            description: req.body.description,
+            sellerId: req.user.id
+        })
+            .then(product => {
+                console.log(product);
+                res.redirect("/shop");
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    });
 
 app
     .route('/')

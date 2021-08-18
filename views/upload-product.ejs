@@ -1,0 +1,49 @@
+<%- include("partials/header") %>
+
+<h1>Upload Product Page</h1>
+<form action="/upload-product" method="post" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="productName">Product Name <span style="color: red">*</span></label>
+    <input
+      type="text"
+      class="form-control"
+      id="productName"
+      name="productName"
+      placeholder="Product Name"
+      required
+    />
+    <label for="stock">Stock <span style="color: red">*</span></label>
+    <input
+      type="number"
+      class="form-control"
+      id="stock"
+      name="stock"
+      placeholder="Stock"
+      required
+    />
+    <label for="price">Price <span style="color: red">*</span></label>
+    <input
+      type="number"
+      class="form-control"
+      id="price"
+      name="price"
+      placeholder="Price"
+      required
+    />
+    <label for="description">Description <span style="color: red">*</span></label>
+    <textarea
+      class="form-control"
+      id="description"
+      name="description"
+      placeholder="Description"
+      rows="4"
+      col="4"
+      required
+    ></textarea>
+    <label for="image">Image <span style="color: red">*</span></label>
+    <input type="file" name="image" max-size="4500" required />
+    <button type="submit">Upload</button>
+  </div>
+</form>
+
+<%- include("partials/footer") %>

@@ -2,16 +2,38 @@
 
 <h3>Complete Seller Registration</h3>
 <p>Please fill in the following form to complete your seller registration.</p>
-<form method="post" action="/complete-seller-registration">
+<form method="POST" action="/complete-seller-registration">
     <div class="form-group">
-        <label for="organisationName">Organisation Name</label>
-        <input type="text" class="form-control" id="organisationName" name="organisationName" placeholder="Organisation Name">
-    </div>
-    <div class="form-group">
-        <label for="website">Website</label>    
-        <input type="text" class="form-control" id="website" name="website" placeholder="Website">
-    </div>
+        <label for="organisationName">Organisation Name <span style="color: red">*</span></label>
+        <input type="text" class="form-control" id="organisationName" name="organisationName" placeholder="Organisation Name" required>
+        <label for="address">Address <span style="color: red">*</span></label>
+        <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
+        <label for="zipcode">Zipcode <span style="color: red">*</span></label>
+        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Zipcode" required>
+        <label for="phoneNumber">Phone Number <span style="color: red">*</span></label>
+        <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" required>
+        <label for="email">Email <span style="color: red">*</span></label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+        <label for="website">Website <span style="color: red">*</span></label>
+        <input type="text" class="form-control" id="website" name="website" placeholder="Website" required>
+        <label for="typeOfBusiness">Type of Business <span style="color: red">*</span></label>
+        <select class="form-control" id="typeOfBusiness" name="typeOfBusiness" required>
+            <option value="" default>Select Type of Business</option>
+            <option value="private-label">Private Label</option>
+            <option value="wholesale">Wholesale</option>
+            <option value="dropship">Dropship</option>
+            <option value="handmade">Handmade</option>
+        </select>
+        <label for="socialMediaHandle">Social Media Handles</label>
+        <input type="text" class="form-control" id="instagram" name="instagram" placeholder="Instagram" >
+        <input type="text" class="form-control" id="facebook" name="facebook" placeholder="Facebook" >
+        <input type="text" class="form-control" id="twitter" name="twitter" placeholder="Twitter" >
+        <input type="text" class="form-control" id="linkedin" name="linkedin" placeholder="LinkedIn" >
+        <label for="employmentHistory">Employment History <span style="color: red">*</span></label>
+        <textarea class="form-control" id="employmentHistory" name="employmentHistory" rows="5" placeholder="Employment History" required></textarea>
+
     <button class="btn btn-primary" type="submit">Submit</button>
+</div>
 </form>
 
 <%- include("partials/footer") %> 
